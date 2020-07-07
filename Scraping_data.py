@@ -11,7 +11,8 @@ import time
 import requests
 import html
 from Insert_On_Datbase import create_filename,insert_in_Local
-
+import wx
+app = wx.App()
 
 # def Translate_close(text_without_translate):
 #     a1 = 0
@@ -172,7 +173,17 @@ def Scraping_data(get_htmlSource, browser,purchaser,reference_number,Title,Tende
                 SegField[SegIndex] = html.unescape(str(SegField[SegIndex]))
                 SegField[SegIndex] = str(SegField[SegIndex]).replace("'", "''")
 
-            check_date(get_htmlSource, SegField)
+            if len(SegField[19]) >= 200:
+                SegField[19] = str(SegField[19])[:200]+'...'
+
+            if len(SegField[18]) >= 1500:
+                SegField[18] = str(SegField[18])[:1500]+'...'
+
+            
+            if SegField[19] == '':
+                wx.MessageBox(' Short Desc Blank ','bzp.uzp.gov.pl', wx.OK | wx.ICON_INFORMATION)
+            else:
+                check_date(get_htmlSource, SegField)
             # create_filename(get_htmlSource, SegField)
             a = True
         except Exception as e:
@@ -184,22 +195,24 @@ def Scraping_data(get_htmlSource, browser,purchaser,reference_number,Title,Tende
 
 
 def check_date(get_htmlSource, SegField):
-    tender_date = str(SegField[24])
-    nowdate = datetime.now()
-    date2 = nowdate.strftime("%Y-%m-%d")
+    deadline = str(SegField[24])
+    curdate = datetime.now()
+    curdate_str = curdate.strftime("%Y-%m-%d")
     try:
-        if tender_date != '':
-            deadline = time.strptime(tender_date , "%Y-%m-%d")
-            currentdate = time.strptime(date2 , "%Y-%m-%d")
-            if deadline > currentdate:
+        if deadline != '':
+            datetime_object_deadline = datetime.strptime(deadline, '%Y-%m-%d')
+            datetime_object_curdate = datetime.strptime(curdate_str, '%Y-%m-%d')
+            timedelta_obj = datetime_object_deadline - datetime_object_curdate
+            day = timedelta_obj.days
+            if day > 0:
                 insert_in_Local(get_htmlSource, SegField)
             else:
-                print("Tender Expired")
+                print("Expired Tender")
                 Global_var.expired += 1
         else:
-            print("Deadline was not given")
+            print("Deadline Not Given")
             Global_var.deadline_Not_given += 1
     except Exception as e:
         exc_type , exc_obj , exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print("Error ON : " , sys._getframe().f_code.co_name + "--> " + str(e) , "\n" , exc_type , "\n" , fname , "\n" , exc_tb.tb_lineno)
+        print("Error ON : " , sys._getframe().f_code.co_name + "--> " + str(e) , "\n" , exc_type , "\n" , fname , "\n" ,exc_tb.tb_lineno)

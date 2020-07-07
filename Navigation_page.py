@@ -8,14 +8,14 @@ from Scraping_data import Scraping_data
 
 
 def ChromeDriver():
-    File_Location = open(
-        "D:\\0 PYTHON EXE SQL CONNECTION & DRIVER PATH\\bzp.uzp.gov.pl\\Location For Database & Driver.txt", "r")
-    TXT_File_AllText = File_Location.read()
-    Chromedriver = str(TXT_File_AllText).partition("Driver=")[2].partition("\")")[0].strip()
-    browser = webdriver.Chrome(executable_path=str(Chromedriver))
+    # File_Location = open("D:\\0 PYTHON EXE SQL CONNECTION & DRIVER PATH\\bzp.uzp.gov.pl\\Location For Database & Driver.txt", "r")
+    # TXT_File_AllText = File_Location.read()
+    # Chromedriver = str(TXT_File_AllText).partition("Driver=")[2].partition("\")")[0].strip()
+    # browser = webdriver.Chrome(executable_path=str(Chromedriver))
+    browser = webdriver.Chrome(executable_path=str(f"C:\\chromedriver.exe"))
     browser.get('http://searchbzp.uzp.gov.pl/Search.aspx')
     browser.maximize_window()
-    time.sleep(2)
+    time.sleep(3)
 
     for From_Date in browser.find_elements_by_xpath('//*[@id="MainContent_dateDataPublikacjiOd_I"]'):
         From_Date.send_keys(str(Global_var.From_Date))
@@ -153,6 +153,7 @@ def Nav_link(browser):
                                     Global_var.QC_Tender) + "", "bzp.uzp.gov.pl", 1)
                             Global_var.Process_End()
                             browser.close()
+                            sys.exit()
                             break
                 for pages_button in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXPagerBottom_PBN"]'):
                     pages_button.click()

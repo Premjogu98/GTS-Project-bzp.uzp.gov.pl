@@ -62,12 +62,13 @@ def Scraping_data(get_htmlSource, browser,purchaser,reference_number,Title,Tende
     while a == False:
         try:
             SegField = []
-            for data in range(42):
+            for data in range(45):
                 SegField.append('')
             # Email
             Email = get_htmlSource.partition('ctl00_ContentPlaceHolder1_zamawiajacy_email">')[2].partition("</span>")[0].strip()
-            Email = html.unescape(str(Email))
-            SegField[1] = Email
+            Email_regex = re.findall("([a-zA-Z0-9_.+-]+@[a-zA-Z0-9_.+-]+\.[a-zA-Z]+)", Email)
+            if len(Email_regex) != 0:
+                SegField[1] = str(Email_regex[0])
 
             # Address
             zamawiajacy_nazwa = get_htmlSource.partition('ctl00_ContentPlaceHolder1_zamawiajacy_nazwa">')[2].partition('<span id="ctl00_ContentPlaceHolder1_regon">')[0].strip().replace('</span>','')
@@ -132,6 +133,10 @@ def Scraping_data(get_htmlSource, browser,purchaser,reference_number,Title,Tende
             SegField[27] = "0"  # Financier
             url = browser.current_url
             SegField[28] = str(url)
+            SegField[20] = ""
+            SegField[21] = ""
+            SegField[42] = SegField[7]
+            SegField[43] = ""
             Main_title = Title
             if Main_title != "":
                 # Main_title = Translate(str(Main_title))

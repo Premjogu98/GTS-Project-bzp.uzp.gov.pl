@@ -130,7 +130,7 @@ def Scraping_data(get_htmlSource, browser,purchaser,reference_number,Title,Tende
             SegField[14] = '2'
             SegField[22] = "0"
             SegField[26] = "0.0"
-            SegField[27] = "0"  # Financier
+            SegField[27] = "0"   # Financier
             url = browser.current_url
             SegField[28] = str(url)
             SegField[20] = ""

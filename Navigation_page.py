@@ -63,153 +63,89 @@ def Nav_link(browser):
         break
     if pages == "":
         pages = "1"
-    else:pass
-    tr = 0
-    page_tr = 2
-    for next_page in range(int(pages)):
-        a = False
-        while a == False:
-            try:
-                for tr1 in range(0, 20, 1):
-                    browser.switch_to.window(browser.window_handles[0])
-                    for publish_date in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXDataRow'+str(tr)+'"]/td[4]'):
-                        pubdate = publish_date.get_attribute("innerText")
-                        datetime_object = datetime.strptime(pubdate, '%Y-%m-%d')
-                        publish_date1 = datetime_object.strftime("%Y-%m-%d")
-                        if publish_date1 >= Global_var.From_Date:
-                            print("♥ Tender Date Alive ♥")
-                            purchaser = ''
-                            Tender_id = ''
-                            Title = ''
-                            reference_number = ''
-                            for purchaser in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXDataRow'+str(tr)+'"]/td[5]'):
-                                purchaser = purchaser.get_attribute('innerText').strip()
-                                if ',' in purchaser:
-                                    purchaser_split_list = purchaser.split(",")
-                                    purchaser = str(purchaser_split_list[0])
-                                break
-                            for Tender_id in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXDataRow'+str(tr)+'"]/td[3]'):
-                                Tender_id = Tender_id.get_attribute('innerText').strip()
-                                break
-                            for Title in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXDataRow'+str(tr)+'"]/td[8]'):
-                                Title = Title.get_attribute('innerText').strip()
-                                if '-' in Title:
-                                    Title = Title.replace('-', '').replace('"','')
-                                break
-                            for reference_number in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXDataRow'+str(tr)+'"]/td[9]'):
-                                reference_number = reference_number.get_attribute('innerText').strip()
-                                if '-' in Title:
-                                    Title = Title.replace('-', '')
-                                break
-                            b = 1
-                            while b == 1:
-                                try:
-                                    for click_on_Zobacz_button in browser.find_elements_by_xpath('/html/body/form/div[4]/div/table[22]/tbody/tr/td/table[1]/tbody/tr['+str(page_tr)+']/td[1]/a'):
-                                        click_on_Zobacz_button = click_on_Zobacz_button.get_attribute('href')
-                                        if click_on_Zobacz_button != '':
-                                            browser.execute_script("window.open('');")
-                                            browser.switch_to.window(browser.window_handles[1])
-                                            browser.get(str(click_on_Zobacz_button))
-                                            b = 0
-                                        else:
-                                            for click_on_Zobacz_button1 in browser.find_elements_by_xpath(
-                                                    '/html/body/form/div[4]/div/table[19]/tbody/tr/td/table[1]/tbody/tr['+str(page_tr)+']/td[1]/a'):
-                                                click_on_Zobacz_button1 = click_on_Zobacz_button1.get_attribute('href')
-                                                browser.execute_script("window.open('');")
-                                                browser.switch_to.window(browser.window_handles[1])
-                                                browser.get(str(click_on_Zobacz_button1))
+    main_detail_list = []
+    for i in range(int(pages)):
+        tr = 2
+        for tr_range in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr'):
+            detail_list = []
+            for publish_date in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[4]'):
+                publish_date = publish_date.get_attribute('innerText').strip()
+                datetime_object = datetime.strptime(publish_date, '%Y-%m-%d')
+                publish_date1 = datetime_object.strftime("%Y-%m-%d")
+                if publish_date1 >= Global_var.From_Date:
+                    detail_list.append(publish_date)
+                    tender_href_text = ''
+                    for tender_href in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[1]/a'):
+                        tender_href_text = tender_href.get_attribute('href').strip()
+                        detail_list.append(tender_href_text)
+                        break
+                    if tender_href_text == '':
+                        detail_list.append('NA')
 
-                                    b = 0
-                                except:
-                                    print('Link nahi mil raha hai click karne ke liye Bhai !!!')
-                                    time.sleep(1.5)
-                                    b = 1
-                            time.sleep(1.5)
-                            try:
-                                browser.switch_to.window(browser.window_handles[1])
-                            except:
-                                browser.switch_to.window(browser.window_handles[0])
-                            clicking_process(browser, purchaser, reference_number, Title, Tender_id)
-                            Global_var.Total += 1
-                            print(" Total: " + str(
-                                Global_var.Total) + " Duplicate: " + str(
-                                Global_var.duplicate) + " Expired: " + str(
-                                Global_var.expired) + " Inserted: " + str(
-                                Global_var.inserted) + " Skipped: " + str(
-                                Global_var.skipped) + " Deadline Not given: " + str(
-                                Global_var.deadline_Not_given) + " QC Tenders: " + str(
-                                Global_var.QC_Tender), "\n")
-                            # browser.refresh()
-                            page_tr += 1
-                            tr += 1
-                        else:
-                            ctypes.windll.user32.MessageBoxW(0, "Total: " + str(
-                                    Global_var.Total) + "\n""Duplicate: " + str(
-                                    Global_var.duplicate) + "\n""Expired: " + str(
-                                    Global_var.expired) + "\n""Inserted: " + str(
-                                    Global_var.inserted) + "\n""Skipped: " + str(
-                                    Global_var.skipped) + "\n""Deadline Not given: " + str(
-                                    Global_var.deadline_Not_given) + "\n""QC Tenders: " + str(
-                                    Global_var.QC_Tender) + "", "bzp.uzp.gov.pl", 1)
-                            Global_var.Process_End()
-                            browser.close()
-                            sys.exit()
-                            break
-                for pages_button in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXPagerBottom_PBN"]'):
-                    pages_button.click()
-                    time.sleep(2)
-                    break
-                a = True
-                page_tr = 2
-            except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n",
-                      fname,
-                      "\n", exc_tb.tb_lineno)
-                time.sleep(5)
-                a = False
+                    tender_id_text = ''
+                    for tender_id in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[3]'):
+                        tender_id_text = tender_id.get_attribute('innerText').strip()
+                        detail_list.append(tender_id_text)
+                        break
+                    if tender_id_text == '':
+                        detail_list.append('NA')
 
-    # IF range Complete Then it will be exit
-    ctypes.windll.user32.MessageBoxW(0, "Total: " + str(
-        Global_var.Total) + "\n""Duplicate: " + str(
-        Global_var.duplicate) + "\n""Expired: " + str(
-        Global_var.expired) + "\n""Inserted: " + str(
-        Global_var.inserted) + "\n""Skipped: " + str(
-        Global_var.skipped) + "\n""Deadline Not given: " + str(
-        Global_var.deadline_Not_given) + "\n""QC Tenders: " + str(
-        Global_var.QC_Tender) + "", "bzp.uzp.gov.pl", 1)
-    Global_var.Process_End()
-    browser.quit()
-    sys.exit()
-
-
-def clicking_process(browser, purchaser, reference_number, Title, Tender_id):
-    a = False
-    while a == False:
+                    purchaser_text = ''
+                    for purchaser in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[5]'):
+                        purchaser_text = purchaser.get_attribute('innerText').strip()
+                        detail_list.append(purchaser_text)
+                        break
+                    if purchaser_text == '':
+                        detail_list.append('NA')
+                    
+                    Title_text = ''
+                    for Title in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[8]'):
+                        Title_text = Title.get_attribute('innerText').strip()
+                        detail_list.append(Title_text)
+                        break
+                    if Title_text == '':
+                        detail_list.append('NA')
+                    
+                    refrence_no_text = ''
+                    for refrence_no in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[9]'):
+                        refrence_no_text = refrence_no.get_attribute('innerText').strip()
+                        detail_list.append(refrence_no_text)
+                        break
+                    if refrence_no_text == '':
+                        detail_list.append('NA')
+                    main_detail_list.append(detail_list)
+                tr +=1
         try:
-            for Web_page in browser.find_elements_by_xpath("/html"):
-                get_htmlSource = Web_page.get_attribute("outerHTML").replace('href="../', 'href="https://bzp.uzp.gov.pl/').replace('<input type="submit" name="ctl00$ContentPlaceHolder1$btnWydrukStrony" value="Wydruk strony" id="ctl00_ContentPlaceHolder1_btnWydrukStrony" class="no-print">', '')
-                Scraping_data(get_htmlSource, browser,purchaser,reference_number,Title,Tender_id)
-                try:
-                    browser.switch_to.window(browser.window_handles[1])
-                    browser.close()
-                    browser.switch_to.window(browser.window_handles[0])
-                except:pass
-                time.sleep(2)
-            a = True
-        except Exception as e:
-            browser.switch_to.window(browser.window_handles[0])
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname,
-                  "\n", exc_tb.tb_lineno)
-            time.sleep(5)
-            a = False
+            for next_page in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXPagerBottom_PBN"]'):
+                next_page.click()
+                time.sleep(3)
+                break
+        except:
+            pass     
+    clicking_process(browser,main_detail_list)  
 
-            browser.switch_to.window(browser.window_handles[1])
-            browser.close()
-            browser.switch_to.window(browser.window_handles[0])
+def clicking_process(browser,main_detail_list) :
+
+    dist_main_detail_list = []
+    dist_main_detail_list.extend(x for x in main_detail_list if x not in dist_main_detail_list) # remove Duplicate List From List
+    dist_main_detail_list1 = list(dist_main_detail_list)
+
+    for deatail_list in dist_main_detail_list1:
+        browser.get(deatail_list[1])
+        time.sleep(2)
+        purchaser = deatail_list[3]
+        reference_number = deatail_list[5]
+        Title = deatail_list[4]
+        Tender_id = deatail_list[2]
+        get_htmlSource = ''
+        for Web_page in browser.find_elements_by_xpath("/html"):
+            get_htmlSource = Web_page.get_attribute("outerHTML").replace('href="../', 'href="https://bzp.uzp.gov.pl/').replace('<input type="submit" name="ctl00$ContentPlaceHolder1$btnWydrukStrony" value="Wydruk strony" id="ctl00_ContentPlaceHolder1_btnWydrukStrony" class="no-print">', '')
+            break
+        Scraping_data(get_htmlSource, browser,purchaser,reference_number,Title,Tender_id)
+        print(" Total: " + str(len(dist_main_detail_list1)) + " Duplicate: " + str(Global_var.duplicate) + " Expired: " + str(Global_var.expired) + " Inserted: " + str(Global_var.inserted) + " Skipped: " + str(Global_var.skipped) + " Deadline Not given: " + str(Global_var.deadline_Not_given) + " QC Tenders: " + str(Global_var.QC_Tender), "\n")
+    ctypes.windll.user32.MessageBoxW(0, "Total: " + str(len(dist_main_detail_list1)) + "\n""Duplicate: " + str(Global_var.duplicate) + "\n""Expired: " + str(Global_var.expired) + "\n""Inserted: " + str(Global_var.inserted) + "\n""Skipped: " + str(Global_var.skipped) + "\n""Deadline Not given: " + str(Global_var.deadline_Not_given) + "\n""QC Tenders: " + str(Global_var.QC_Tender) + "", "bzp.uzp.gov.pl", 1)
+    browser.close()
+    sys.exit()
 
 
 ChromeDriver()

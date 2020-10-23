@@ -167,7 +167,7 @@ def Scraping_data(get_htmlSource, browser,purchaser,reference_number,Title,Tende
                         all_string += result2.strip(",")
                 except:
                     pass
-                print(all_string.strip(","))
+                # print(all_string.strip(","))
                 SegField[36] = all_string
             else:
                 SegField[36] = ""

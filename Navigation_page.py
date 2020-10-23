@@ -66,62 +66,78 @@ def Nav_link(browser):
     main_detail_list = []
     for i in range(int(pages)):
         tr = 2
-        for tr_range in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr'):
-            detail_list = []
-            for publish_date in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[4]'):
-                publish_date = publish_date.get_attribute('innerText').strip()
-                datetime_object = datetime.strptime(publish_date, '%Y-%m-%d')
-                publish_date1 = datetime_object.strftime("%Y-%m-%d")
-                if publish_date1 >= Global_var.From_Date:
-                    detail_list.append(publish_date)
-                    tender_href_text = ''
-                    for tender_href in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[1]/a'):
-                        tender_href_text = tender_href.get_attribute('href').strip()
-                        detail_list.append(tender_href_text)
-                        break
-                    if tender_href_text == '':
-                        detail_list.append('NA')
+        error = True
+        while error == True:
+            try:
+                for tr_range in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr'):
+                    browser.execute_script("arguments[0].scrollIntoView();", tr_range)
+                    detail_list = []
+                    for publish_date in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[4]'):
+                        publish_date = publish_date.get_attribute('innerText').strip()
+                        datetime_object = datetime.strptime(publish_date, '%Y-%m-%d')
+                        publish_date1 = datetime_object.strftime("%Y-%m-%d")
+                        if publish_date1 >= Global_var.From_Date:
+                            detail_list.append(publish_date)
+                            tender_href_text = ''
+                            for tender_href in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[1]/a'):
+                                tender_href_text = tender_href.get_attribute('href').strip()
+                                detail_list.append(tender_href_text)
+                                print(tender_href_text)
+                                break
+                            if tender_href_text == '':
+                                detail_list.append('NA')
 
-                    tender_id_text = ''
-                    for tender_id in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[3]'):
-                        tender_id_text = tender_id.get_attribute('innerText').strip()
-                        detail_list.append(tender_id_text)
-                        break
-                    if tender_id_text == '':
-                        detail_list.append('NA')
+                            tender_id_text = ''
+                            for tender_id in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[3]'):
+                                tender_id_text = tender_id.get_attribute('innerText').strip()
+                                detail_list.append(tender_id_text)
+                                break
+                            if tender_id_text == '':
+                                detail_list.append('NA')
 
-                    purchaser_text = ''
-                    for purchaser in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[5]'):
-                        purchaser_text = purchaser.get_attribute('innerText').strip()
-                        detail_list.append(purchaser_text)
-                        break
-                    if purchaser_text == '':
-                        detail_list.append('NA')
-                    
-                    Title_text = ''
-                    for Title in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[8]'):
-                        Title_text = Title.get_attribute('innerText').strip()
-                        detail_list.append(Title_text)
-                        break
-                    if Title_text == '':
-                        detail_list.append('NA')
-                    
-                    refrence_no_text = ''
-                    for refrence_no in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[9]'):
-                        refrence_no_text = refrence_no.get_attribute('innerText').strip()
-                        detail_list.append(refrence_no_text)
-                        break
-                    if refrence_no_text == '':
-                        detail_list.append('NA')
-                    main_detail_list.append(detail_list)
-                tr +=1
-        try:
-            for next_page in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXPagerBottom_PBN"]'):
-                next_page.click()
-                time.sleep(3)
-                break
-        except:
-            pass     
+                            purchaser_text = ''
+                            for purchaser in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[5]'):
+                                purchaser_text = purchaser.get_attribute('innerText').strip()
+                                detail_list.append(purchaser_text)
+                                break
+                            if purchaser_text == '':
+                                detail_list.append('NA')
+                            
+                            Title_text = ''
+                            for Title in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[8]'):
+                                Title_text = Title.get_attribute('innerText').strip()
+                                detail_list.append(Title_text)
+                                break
+                            if Title_text == '':
+                                detail_list.append('NA')
+                            
+                            refrence_no_text = ''
+                            for refrence_no in browser.find_elements_by_xpath(f'//*[@id="MainContent_gvSzukaj_DXMainTable"]/tbody/tr[{str(tr)}]/td[9]'):
+                                refrence_no_text = refrence_no.get_attribute('innerText').strip()
+                                detail_list.append(refrence_no_text)
+                                break
+                            if refrence_no_text == '':
+                                detail_list.append('NA')
+                            main_detail_list.append(detail_list)
+                        tr +=1
+                a = True
+                while a == True:
+                    try:
+                        for next_page in browser.find_elements_by_xpath('//*[@id="MainContent_gvSzukaj_DXPagerBottom_PBN"]'):
+                            browser.execute_script("arguments[0].scrollIntoView();", next_page)
+                            next_page.click()
+                            time.sleep(4)
+                            a = False
+                            break
+                    except:
+                        print('Error On Next Page Button')
+                        a = True
+                error = False    
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname, "\n",exc_tb.tb_lineno)
+                error = True   
     clicking_process(browser,main_detail_list)  
 
 def clicking_process(browser,main_detail_list) :
